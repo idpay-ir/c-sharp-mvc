@@ -1,0 +1,43 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<div style="display:inline-block;padding-top:50px;width:100%;">
+    <form class="form col-md-6 col-md-offset-3" id="Payment" role="form">
+        <legend>تست درگاه پرداخت</legend>
+        <br />
+        <input class="form-control input-mi" id="txtAmount" placeholder="مبلغ پرداختی" type="text" value="100000000" />
+        <br />
+        <span class="btn btn-lg btn-block" id="btnPayment">پرداخت</span>
+    </form>
+</div>
+
+@section scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#btnPayment").click(function () {
+                var model = { Amount: $("#txtAmount").val() }
+                $.ajax({
+                    type: "POST", url: "/Home/Payment",
+                    data: JSON.stringify(model),
+                    contentType: "application/json;charset=utf-8", dataType: "text", 
+                    success: Paymenting, error: ErrorInPayment
+                });
+            });
+        });
+        function Paymenting(res) {
+            var Result;
+            if (typeof res == "string") res = JSON.parse(res);
+            if (typeof res == 'object' && res.d) Result = res.d; else Result = res;
+            if (typeof Result == "string") Result = JSON.parse(Result);
+            if (!Result.PaymentUrl || Result.PaymentUrl == "") {
+                alert(!Result.Message ? "خطا در پرداخت رخ داده است" : Result.Message);
+                return;
+            }
+            location.href = Result.PaymentUrl;
+        }
+        function ErrorInPayment(jqXHR, textStatus, errorThrown) {
+            alert("خطا در پرداخت رخ داده است");
+        }
+    </script>
+}

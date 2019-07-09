@@ -1,0 +1,40 @@
+﻿
+@{
+    ViewBag.Title = "AfterPayment";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>@ViewBag.Message</h2>
+
+@if (!string.IsNullOrEmpty(ViewBag.ID))
+{
+    <span class="btn btn-lg btn-block" id="btnInquiry">استعلام وضعیت پرداخت</span>
+}
+
+@section scripts {
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#btnInquiry").click(function () {
+                var model = { ID: '@ViewBag.ID', OrderID: '@ViewBag.OrderID' }
+                $.ajax({
+                    type: "POST", url: "/Home/Inquiry",
+                    data: JSON.stringify(model),
+                    contentType: "application/json;charset=utf-8", dataType: "text",
+                    success: Inquirying, error: ErrorInInquiry
+                });
+            });
+        });
+        function Inquirying(res) {
+            var Result;
+            if (typeof res == "string") res = JSON.parse(res);
+            if (typeof res == 'object' && res.d) Result = res.d; else Result = res;
+            if (typeof Result == "string") Result = JSON.parse(Result);
+            alert(Result.Message);
+        }
+        function ErrorInInquiry(jqXHR, textStatus, errorThrown) {
+            alert("خطا در استعلام وضعیت رخ داده است");
+        }
+    </script>
+}
+
+
